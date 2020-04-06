@@ -1,32 +1,22 @@
 
 const PORT = 1904
 
-const http = require('http')
+const express = require('express')
 const url = require('url')
 const webApi = require('./it-web-api')
 
-const server = http.createServer(processHttpRequests)
 
-server.listen(PORT, () => console.log(`Server listening on port ${PORT}`))
+const app = express()
+
+app.use(express.json())
+
+app.get('/it/api/issues', webApi.getIssues)
+app.get('/it/api/issues/:id', webApi.getIssue)
+app.post('/it/api/issues', webApi.addIssue)
+app.delete('/it/api/issues/:id', webApi.deleteIssue)
 
 
-
-
-function processHttpRequests(req, rsp) {
-  const reqUrl = url.parse(req.url)
-  console.log("###" + reqUrl.pathname)
-
-
-  // HORROR: The following code  is simply horrendous!!!!!
-  if (req.method == "GET") {
-    if (reqUrl.pathname == "/it/api/issues") {
-      return webApi.getIssues(req, rsp)
-    }
-    if (reqUrl.pathname.startsWith("/it/api/issues")) {
-      return webApi.getIssue(req, rsp)
-    }
-  }
-}
+app.listen(PORT, () => console.log(`Server listening on port ${PORT}`))
 
 
 

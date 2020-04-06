@@ -1,11 +1,14 @@
 
 const url = require('url')
 const itServices = require('./it-services')
+const error = require('./error')
 
 
 module.exports = {
   getIssues : getIssues,
-  getIssue : getIssue
+  getIssue : getIssue,
+  addIssue : addIssue,
+  deleteIssue : deleteIssue
 }
 
 
@@ -13,13 +16,9 @@ module.exports = {
 // GET /it/api/issues
 
 function getIssues(req, rsp) {
-  itServices.getIssues(processIssues)
+  itServices.getIssues(processResponse(rsp))
 
-  function processIssues(e, issues) { 
-    rsp.statusCode = 200
-    rsp.setHeader("Content-Type", "application/json")
-    rsp.end(JSON.stringify(issues))
-  }
+  
 }
 
 
@@ -27,17 +26,36 @@ function getIssues(req, rsp) {
 // GET /it/api/issues/:id
 
 function getIssue(req, rsp) {
-  const reqUrl = url.parse(req.url)
-  const id = reqUrl.pathname.split('/').pop()
+  itServices.getIssue(req.params.id, processResponse(rsp))
 
-  itServices.getIssue(id, processIssue)
+  
+}
 
-  function processIssue(e, issue) { 
-    rsp.statusCode = 200
+
+
+// POST /it/api/issues
+function addIssue(req, rsp) {
+
+  console.log("body received: ", req.body)
+  itServices.addIssue(req.body, processResponse(rsp, 201))
+}
+
+
+// DELETE /it/api/issues/:id
+
+function deleteIssue(req, rsp) {
+  itServices.deleteIssue(req.params.id, processResponse(rsp))
+
+}
+
+function processResponse(rsp, successStatusCode = 200) {
+  return function processIssues(e, issues) { 
+    rsp.statusCode = e ? error.toHttpStatusCode(e) : successStatusCode 
     rsp.setHeader("Content-Type", "application/json")
-    rsp.end(JSON.stringify(issue))
+    rsp.end(JSON.stringify(issues))
   }
 }
+
 
 
 

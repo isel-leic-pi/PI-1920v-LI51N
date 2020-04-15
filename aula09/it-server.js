@@ -3,7 +3,14 @@ const PORT = 1904
 
 const express = require('express')
 const url = require('url')
-const webApi = require('./it-web-api')
+
+const db = require('./it-db')
+const services = require('./it-services')(db)
+
+const webApi = require('./it-web-api')(services)
+
+
+
 
 
 const app = express()

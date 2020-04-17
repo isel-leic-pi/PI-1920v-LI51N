@@ -3,25 +3,23 @@ const url = require('url')
 
 const error = require('./error')
 
+const router = require('express').Router() 
+
 
 module.exports = function (itServices) {
-  const itServices = services;
+  router.get('/issues', getIssues)
+  router.get('/issues/:id', getIssue)
+  router.post('/issues', addIssue)
+  router.delete('/issues/:id', deleteIssue)
+  
 
-  return {
-    getIssues: getIssues,
-    getIssue: getIssue,
-    addIssue: addIssue,
-    deleteIssue: deleteIssue
-  }
-
+  return router;
 
 
   // GET /it/api/issues
 
   function getIssues(req, rsp) {
     itServices.getIssues(processResponse(rsp))
-
-
   }
 
 

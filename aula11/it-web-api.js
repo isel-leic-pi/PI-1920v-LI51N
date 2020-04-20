@@ -19,6 +19,7 @@ module.exports = function (itServices) {
   // GET /it/api/issues
 
   function getIssues(req, rsp) {
+    throw "Some exception"
     setTimeout( () => itServices.getIssues(processResponse(rsp)), 5000)
   }
 

@@ -4,6 +4,8 @@ const express = require('express')
 const url = require('url')
 const morgan = require('morgan')
 
+const requestMeasure = require('./chelas-request-time.js')({start: true, end: true, duration: true })
+
 const db = require('./it-db')()
 const services = require('./it-services')(db)
 
@@ -11,40 +13,34 @@ const webApiRouter = require('./it-web-api')(services)
 
 const app = express()
 
+
+
 app.use(morgan('dev'))
 app.use(requestMeasure)
 app.use(express.json())
-
-app.use('/it/api', mw2)
-app.use(mw1)
-
+app.use('/files/', express.static('./public'))
 app.use('/it/api', webApiRouter)
+app.use(function (req, res, next) {
+  res.status(404).send("Sorry can't find that!")
+})
+
+app.use(logErrors)
+app.use(myErrorMw)
+
 
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`))
 
 
-function mw1(req, rsp, next) {
-  console.log('mw1 was called')
-  next()
-}
-
-function mw2(req, rsp, next) {
-  console.log('mw2 was called')
-  next()
+function logErrors (err, req, res, next) {
+  console.error("Error logger: ", err)
+  next(err)
 }
 
 
-function requestMeasure(req, rsp, next) {
-  const start = Date.now()
-  rsp.on('finish', endRequest)
-  next()
-
-  function endRequest() {
-    const end = Date.now()
-    console.log(`Request took ${end-start} ms`)
-  }
-
+function myErrorMw(err, req, res, next) {
+  console.log("Error")
+  console.error(err.stack)
+  res.status(500).send('Something broke!')
 }
-
 
 

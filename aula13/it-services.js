@@ -16,35 +16,34 @@ module.exports = function (itDb) {
     itDb = db
   }
 
-  function getIssues(cb) {
-    itDb.getIssues(cb)
+  function getIssues() {
+    return itDb.getIssues()
   }
 
-  function getIssue(id, cb) {
+  function getIssue(id) {
     if (isInvalidId(id)) {
-      cb(error('Invalid id to get a resource'))
+      return Promise.resolve(error('Invalid id to get a resource'))
     }
 
-    itDb.getIssue(id, cb)
+    return itDb.getIssue(id)
   }
 
-  function addIssue(issue, cb) {
+  function addIssue(issue) {
     // Issue validation should be done here
 
-    itDb.addIssue(issue, cb)
+    return itDb.addIssue(issue)
   }
 
-  function deleteIssue(id, cb) {
+  function deleteIssue(id) {
     if (isInvalidId(id)) {
-      cb(error('Invalid id for resource to delete'))
+      return Promise.reject(error('Invalid id for resource to delete'))
     }
 
-    itDb.deleteIssue(id, cb)
+    return itDb.deleteIssue(id)
   }
 
 
   function isInvalidId(id) {
     return !id || !Number(id)
   }
-
 }

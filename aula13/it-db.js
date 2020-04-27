@@ -14,28 +14,28 @@ module.exports = function (issuesFile = './issues') {
   }
 
 
-  function getIssues(cb) {
-    cb(null, issues)
+  function getIssues() {
+    return Promise.resolve(issues)
 
   }
 
-  function getIssue(id, cb) {
+  function getIssue(id) {
     const issue = issues.find(issue => issue.id == id)
     if (!issue) {
-      return cb(`Could not find issue with id ${id}`)
+      return Promise.reject(`Could not find issue with id ${id}`)
     }
-    cb(null, issue)
+    return Promise.resolve(issue)
   }
 
-  function addIssue(issue, cb) {
+  function addIssue(issue) {
     issue.id = maxId++
     issues.push(issue)
 
-    cb(null, issue)
+    return Promise.resolve(issue)
   }
 
 
-  function deleteIssue(id, cb) {
+  function deleteIssue(id) {
     const idx = issues.findIndex(issue => issue.id == id)
     if (idx == -1) {
       cb(`Could not find issue with id ${id}`)
@@ -46,7 +46,7 @@ module.exports = function (issuesFile = './issues') {
     const issue = issues.splice(idx, 1)[0]
 
 
-    cb(null, issue)
+    return Promise.resolve(issue)
   }
 
 }

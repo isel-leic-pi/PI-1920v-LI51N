@@ -19,17 +19,14 @@ module.exports = function (itServices) {
   // GET /it/api/issues
 
   function getIssues(req, rsp) {
-    itServices.getIssues(processResponse(rsp))
+    sendResponse(itServices.getIssues(), rsp)
   }
-
 
 
   // GET /it/api/issues/:id
 
   function getIssue(req, rsp) {
-    itServices.getIssue(req.params.id, processResponse(rsp))
-
-
+    sendResponse(itServices.getIssue(req.params.id), rsp)
   }
 
 
@@ -38,26 +35,40 @@ module.exports = function (itServices) {
   function addIssue(req, rsp) {
 
     console.log("body received: ", req.body)
-    itServices.addIssue(req.body, processResponse(rsp, 201))
+    sendResponse(itServices.addIssue(req.body), rsp, 201)
   }
 
 
   // DELETE /it/api/issues/:id
 
   function deleteIssue(req, rsp) {
-    itServices.deleteIssue(req.params.id, processResponse(rsp))
-
+    sendResponse(itServices.deleteIssue(req.params.id), rsp)
   }
 
-  function processResponse(rsp, successStatusCode = 200) {
-    return function processIssues(e, issues) {
-      rsp.statusCode = e ? error.toHttpStatusCode(e) : successStatusCode
+  ////////////// Internal auxiliary functions
+
+
+  function sendResponse(p, rsp, successStatusCode = 200, errStatusCode = 500) {
+    p.then(processSuccess(rsp, successStatusCode)).catch(processError(rsp, errStatusCode))
+  }
+
+  function processSuccess(rsp, statusCode) {
+    console.log("processSuccess")
+    return processResponse(rsp, () => statusCode)
+  }
+
+  function processError(rsp, statusCode) {
+    console.log("processError")
+    return processResponse(rsp, (data) => error.toHttpStatusCode(data))
+  }
+
+  function processResponse(rsp, statusCodeSup) {
+    return function (data) {
+      rsp.statusCode = statusCodeSup(data)
       rsp.setHeader("Content-Type", "application/json")
-      rsp.end(JSON.stringify(issues))
+      rsp.end(JSON.stringify(data))
     }
   }
-
-
 }
 
 

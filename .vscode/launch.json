@@ -7,9 +7,22 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Node Application",
-            "program": "${workspaceFolder}/Aula22/03-creating-promises.js"
+            "name": "Issues Server dev - npm",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run",
+                "start-dev"
+            ],
+            "port": 9229,
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Issues Server",
+            "program": "${workspaceFolder}/aula13/it-server.js"
         }
-        
     ]
 }

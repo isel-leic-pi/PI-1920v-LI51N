@@ -13,20 +13,20 @@ module.exports = function (itServices) {
   router.delete('/issues/:id', deleteIssue)
   
 
+  Promise.prototype.sendResponse = sendResponse
+
   return router;
 
 
   // GET /it/api/issues
-
   function getIssues(req, rsp) {
-    sendResponse(itServices.getIssues(), rsp)
+    itServices.getIssues().sendResponse(rsp)
   }
 
 
   // GET /it/api/issues/:id
-
   function getIssue(req, rsp) {
-    sendResponse(itServices.getIssue(req.params.id), rsp)
+    itServices.getIssue(req.params.id).sendResponse(rsp)
   }
 
 
@@ -35,21 +35,21 @@ module.exports = function (itServices) {
   function addIssue(req, rsp) {
 
     console.log("body received: ", req.body)
-    sendResponse(itServices.addIssue(req.body), rsp, 201)
+    itServices.addIssue(req.body).sendResponse(rsp, 201)
   }
 
 
   // DELETE /it/api/issues/:id
 
   function deleteIssue(req, rsp) {
-    sendResponse(itServices.deleteIssue(req.params.id), rsp)
+    itServices.deleteIssue(req.params.id).sendResponse(rsp)
   }
 
   ////////////// Internal auxiliary functions
 
 
-  function sendResponse(p, rsp, successStatusCode = 200, errStatusCode = 500) {
-    p.then(processSuccess(rsp, successStatusCode)).catch(processError(rsp, errStatusCode))
+  function sendResponse(rsp, successStatusCode = 200, errStatusCode = 500) {
+    this.then(processSuccess(rsp, successStatusCode)).catch(processError(rsp, errStatusCode))
   }
 
   function processSuccess(rsp, statusCode) {

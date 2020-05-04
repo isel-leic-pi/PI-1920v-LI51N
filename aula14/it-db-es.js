@@ -5,7 +5,7 @@ const config = {
 }
 
 const error = require('./error')
-const req = require('request')
+const fetch = require('node-fetch')
 
 
 module.exports = function () {
@@ -22,44 +22,27 @@ module.exports = function () {
   function UriManager() {
     const baseUri = `http://${config.host}:${config.port}/${config.index}/`
     this.getAllIssuesUri = () => `${baseUri}_search/`
+    this.getIssueUri = (id) => `${baseUri}_doc/${id}`
+    this.getAddIssueUri = () => `${baseUri}_doc/`
   }
   
-
-  
-
-
   function getIssues() {
-    console.log("$$$$$$$$$")
-    return new Promise(function(resolve, reject) { 
-      let uri = uriManager.getAllIssuesUri()
-      console.log("uri" + uri)
-
-      request(uri, processResponse)
-
-      function processResponse(err, rsp, body) {
-        if(err) {
-          reject(err)
-        } else {
-          resolve(body)
-        }
-
-      }
-    })
+    console.log("GetIssues")
+    let uri = uriManager.getAllIssuesUri()
+    return makeRequest(uri).then(body => body.hits.hits.map(issue => { return {id: issue._id, name: issue._source.name, description: issue._source.description } }))
   }
 
   function getIssue(id) {
-    const issue = issues.find(issue => issue.id == id)
-    if (!issue) {
-      return Promise.reject(`Could not find issue with id ${id}`)
-    }
-    return Promise.resolve(issue)
+    let uri = uriManager.getIssueUri(id)
+    return makeRequest(uri)
   }
 
   function addIssue(issue) {
-    issue.id = maxId++
-    issues.push(issue)
 
-    return Promise.resolve(issue)
+    
+    const uri = uriManager.getAddIssueUri()
+    const options = {method: "post", body: JSON.stringify(issue),  headers: { 'Content-Type': 'application/json' } }
+    return makeRequest(uri, options).then(body => { issue.id = body._id; return issue })
   }
 
 
@@ -77,18 +60,16 @@ module.exports = function () {
     return Promise.resolve(issue)
   }
 
+/////////////////////////////////////
+
+  function makeRequest(uri, options) {
+    console.log(`Making a request to ${uri} `)
+    return fetch(uri, options).then(rsp => rsp.json()).then(showBodyResponse)
 
 
-
-
-  function request(uri, cb, method = "GET") {
-    console.log(`Making a ${method} request to ${uri} `)
-    req({ uri: uri}, processRsp)
-
-
-    function processRsp(err, rsp, body) {
-        console.log("Response body1: " + body)
-        cb(err, rsp, JSON.parse(body))
+    function showBodyResponse(body) {
+      console.log(`Response body:"`, body)
+      return body
     }
   }
 }

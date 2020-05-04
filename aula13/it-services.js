@@ -16,8 +16,18 @@ module.exports = function (itDb) {
     itDb = db
   }
 
-  function getIssues() {
-    return itDb.getIssues()
+  async function getIssues() {
+    return itDb.getIssues()//.then(processIssues)
+
+    function processIssues(issues) {
+      return issues.map((issue, idx) => { issue.idx = idx; return issue })
+    }
+
+    // Or the same with with await
+
+    // let issues = await itDb.getIssues()
+
+    // return issues.map((issue, idx) => { issue.idx = idx; return issue })
   }
 
   function getIssue(id) {

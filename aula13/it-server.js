@@ -4,7 +4,7 @@ const express = require('express')
 const url = require('url')
 const morgan = require('morgan')
 
-const db = require('./it-db')()
+const db = require('./it-db-es')()
 const services = require('./it-services')(db)
 
 const webApiRouter = require('./it-web-api')(services)

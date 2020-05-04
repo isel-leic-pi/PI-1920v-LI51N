@@ -53,12 +53,10 @@ module.exports = function (itServices) {
   }
 
   function processSuccess(rsp, statusCode) {
-    console.log("processSuccess")
     return processResponse(rsp, () => statusCode)
   }
 
   function processError(rsp, statusCode) {
-    console.log("processError")
     return processResponse(rsp, (data) => error.toHttpStatusCode(data))
   }
 

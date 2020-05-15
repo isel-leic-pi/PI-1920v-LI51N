@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Css Sample</title>
+
+  <style>
+
+    p { display: inline}
+    span { display: block}
+
+    p, div {
+      border: 1px solid black
+
+    }
+
+    
+    #special {
+      background: darkgoldenrod;
+    }
+
+    .hotdog p.mustard {
+      background: yellow;
+    }
+
+    .hotdog p, .hotdog span  {
+      background: brown;
+    }
+
+    
+
+  </style>
+</head>
+
+<body>
+  <div class="hotdog">
+    <p class="hotdog">Paragraph1</p>
+    <p>Paragraph2</p>
+
+    <div class="hotdog">Text1</div>
+    <span>Text2</span>
+    <p class="mustard">Paragraph3</p>
+    <p class="mustard" id="special">Paragraph4</p>
+  </div>
+
+</body>
+
+</html>

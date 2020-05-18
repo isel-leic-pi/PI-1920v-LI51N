@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Client side JavaScript</title>
+
+    <script>   
+    
+      
+      onload = function() {
+          let b = document.querySelector("#btn")
+          let txt = document.querySelector("#txt")
+          let res = document.querySelector("#result")
+          let clr = document.querySelector("#clear")
+
+          b.onclick = addTextWithNodes
+          clr.onclick = clear
+
+          function addText() {
+            let val = txt.value
+            res.innerHTML += `<li>${val}</li>`
+          }
+
+
+          function addTextWithNodes() {
+            let val = txt.value
+            let li = document.createElement("li")
+            li.innerHTML = val
+            res.appendChild(li)
+
+            li.onclick = deleteItem
+          }
+
+          function deleteItem() {
+            this.parentNode.removeChild(this)
+          }
+
+          
+
+          function clear() { 
+            res.innerHTML = ""
+          }
+      }       
+    </script>
+  </head>
+
+  <body>
+    <p>
+      Insert some text: <input id="txt" value="qq coisa" type="text"/> 
+      <button id="btn">Click me</button>
+      <button id="clear">Clear</button>
+    </p>
+    <ul id="result"></ul>
+
+
+  </body>
+  
+</html>

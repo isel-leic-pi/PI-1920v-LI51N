@@ -29,12 +29,20 @@ module.exports = function () {
   function getIssues() {
     console.log("GetIssues")
     let uri = uriManager.getAllIssuesUri()
-    return makeRequest(uri).then(body => body.hits.hits.map(issue => { return {id: issue._id, name: issue._source.name, description: issue._source.description } }))
+    return makeRequest(uri)
+      .then(body => body.hits.hits.map(issue => { return {id: issue._id, name: issue._source.name, description: issue._source.description } }))
   }
 
   function getIssue(id) {
     let uri = uriManager.getIssueUri(id)
-    return makeRequest(uri)
+    return makeRequest(uri).then(body => { 
+      return {
+        id: body._id, 
+        name: body._source.name,
+        description: body._source.description,
+
+      } 
+    })
   }
 
   function addIssue(issue) {

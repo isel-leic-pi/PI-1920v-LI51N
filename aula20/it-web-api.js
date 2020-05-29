@@ -26,6 +26,7 @@ module.exports = function (itServices) {
 
   // GET /it/api/issues/:id
   function getIssue(req, rsp) {
+    console.log(req.params.id)
     itServices.getIssue(req.params.id).sendResponse(rsp)
   }
 

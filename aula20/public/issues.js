@@ -1,32 +1,90 @@
 window.onload = function (e) {
+
+  
+  
   const config = {
     host: 'localhost',
     port: 1904,
     baseApi: "it/api/"
   }
-
-
+  
   function UriManager() {
     const baseUri = `http://${config.host}:${config.port}/${config.baseApi}`
     this.getAllIssuesUri = () => `${baseUri}issues/`
-    this.getIssueUri = (id) => `${baseUri}issue/${id}`
+    this.getIssueUri = (id) => `${baseUri}issues/${id}`
     this.getAddIssueUri = () => `${baseUri}issues/`
   }
-
+  
   const uriManager = new UriManager()
-
-
-
-  let functionName = window.location.pathname.substring(1).split(".")[0]
-
-  const router = {
-    index: index,
-    issue: issue
+  
+  const states = {
+    issues: {
+      script: showIssues, 
+      template: `
+      <section id="show-issues">
+      <h1>Issues List</h1>
+      <table>
+      <thead>
+      <tr>
+      <td>Name</td>
+      <td>Description</td>
+      </tr>
+      </thead>
+      <tbody id="items"></tbody>
+      </table>
+      </section>
+      
+      <section id="create-issue">
+      <h2>Create a new Issue</h2>
+      <div class="issue-data">
+      <div><span>Issue name: </span><input type="text" id="name" /></div>
+      <div><span>Issue description:</span><input type="text" id="description" /></div>
+      </div>
+      <button id="create-issue-btn">Create Issue</button>
+      
+      </section>`
+    },
+    issue: {
+      script: showIssue, 
+      template: `<h1>Issues details</h1>
+      <article>
+      <div id="id">Id: </div>
+      <div id="name">Name: </div> 
+      <div id="description">Description: </div>
+      </article>`,
+    },
+    about: {
+      script: nop,
+      template: `<h1>About Issues application (TBD)</h1>`
+    }
   }
+  
+  
+  window.onhashchange = stateChanged
+  const mainContent = document.querySelector("#main-content")
 
-  router[functionName]()
+  stateChanged()
+  
+  function stateChanged() {
+    let stateData = window.location.hash.substring(1).split("/")
+    
+    let [state, ...stateArgs] = stateData
+    // Equivalent conde to the previous line
+    // let state = stateData.shift()
+    // let stateArgs = stateData 
+    
+    
+    let stateObj  = states[state]
+    if(!stateObj) {
+      window.location.hash = "issues"
+      return
+    }
+    mainContent.innerHTML = stateObj.template
+    //stateObj.script.apply(null, stateArgs)
+    stateObj.script(...stateArgs)
+ }
 
-  function index() {
+  function showIssues() {
     document.querySelector("#create-issue-btn").onclick = createIssue
 
     fetch(uriManager.getAllIssuesUri())
@@ -39,7 +97,7 @@ window.onload = function (e) {
 
       let itemsHtml = items.map(item =>
         `<tr>
-              <td><a href="issue.html?id=${item.id}">${item.name}</a></td>
+              <td><a href="#issue/${item.id}">${item.name}</a></td>
               <td>${item.description}</td>
           </tr>`)
         .join('\n')
@@ -65,21 +123,19 @@ window.onload = function (e) {
         },
         body: issueBody
       }).then(processResponse)
-    }
 
-    function processResponse(response) {
-      if(response.ok) {
-        location.reload()
-      } else {
-        console.log("error creating issue")
+      function processResponse(response) {
+        if (response.ok) {
+          location.reload()
+        } else {
+          console.log("error creating issue")
+        }
       }
-
     }
   }
 
-  function issue() {
-    const issueId = window.location.search.substring(1).split("=")[1]
-    let uri = uriManager.getIssueUri(id)
+  function showIssue(issueId) {
+    let uri = uriManager.getIssueUri(issueId)
     console.log(uri)
     fetch(uri)
       .then(rsp => rsp.json())
@@ -89,4 +145,7 @@ window.onload = function (e) {
       Object.keys(item).forEach(propName => document.querySelector(`#${propName}`).innerHTML += item[propName])
     }
   }
+
+
+  function nop() { }
 }

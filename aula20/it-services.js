@@ -54,6 +54,7 @@ module.exports = function (itDb) {
 
 
   function isInvalidId(id) {
-    return !id || !Number(id)
+    //return !id || !Number(id)
+    return false
   }
 }

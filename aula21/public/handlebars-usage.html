@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>List all Issues</title>
+  <script src="handlebars.js"></script>
+  <script>
+    window.onload = function () {
+
+
+      const template = Handlebars.compile('<p>{{firstname}} {{lastname}}</p>')
+      const res = template({
+        firstname: "Yehuda",
+        lastname: "Katz"
+      })
+
+      document.querySelector("#main-content").innerHTML = res
+  }
+
+  </script>
+</head>
+
+<body>
+  <div id="main-content" />
+</body>
+
+</html>

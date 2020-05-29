@@ -21,26 +21,28 @@ window.onload = function (e) {
     issues: {
       script: showIssues, 
       template: `
-      <section id="show-issues">
-      <h1>Issues List</h1>
-      <table>
-      <thead>
-      <tr>
-      <td>Name</td>
-      <td>Description</td>
-      </tr>
-      </thead>
-      <tbody id="items"></tbody>
-      </table>
-      </section>
-      
-      <section id="create-issue">
-      <h2>Create a new Issue</h2>
-      <div class="issue-data">
-      <div><span>Issue name: </span><input type="text" id="name" /></div>
-      <div><span>Issue description:</span><input type="text" id="description" /></div>
-      </div>
-      <button id="create-issue-btn">Create Issue</button>
+        <section id="show-issues">
+        <h1>Issues List</h1>
+        <table>
+        <thead>
+        <tr>
+        <td>Name</td>
+        <td>Description</td>
+        </tr>
+        </thead>
+        <tbody id="items">
+        
+        </tbody>
+        </table>
+        </section>
+        
+        <section id="create-issue">
+        <h2>Create a new Issue</h2>
+        <div class="issue-data">
+        <div><span>Issue name: </span><input type="text" id="name" /></div>
+        <div><span>Issue description:</span><input type="text" id="description" /></div>
+        </div>
+        <button id="create-issue-btn">Create Issue</button>
       
       </section>`
     },
@@ -94,13 +96,17 @@ window.onload = function (e) {
 
 
     function showItems(items) {
+      const itemsTemplate = Handlebars.compile(
+        `
+        {{#each this}}
+          <tr>
+            <td><a href="#issue/{{id}}">{{name}}</a></td>
+            <td>{{description}}</td>
+          </tr>
+        {{/each}}
+        `)
 
-      let itemsHtml = items.map(item =>
-        `<tr>
-              <td><a href="#issue/${item.id}">${item.name}</a></td>
-              <td>${item.description}</td>
-          </tr>`)
-        .join('\n')
+      let itemsHtml = itemsTemplate(items)
 
       const table = document.querySelector("#items")
       table.innerHTML += itemsHtml

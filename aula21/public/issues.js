@@ -1,26 +1,25 @@
-window.onload = function (e) {
+Handlebars.compile("blablabla")
 
-  
-  
+window.onload = function (e) {
   const config = {
     host: 'localhost',
     port: 1904,
     baseApi: "it/api/"
   }
-  
+
   function UriManager() {
     const baseUri = `http://${config.host}:${config.port}/${config.baseApi}`
     this.getAllIssuesUri = () => `${baseUri}issues/`
     this.getIssueUri = (id) => `${baseUri}issues/${id}`
     this.getAddIssueUri = () => `${baseUri}issues/`
   }
-  
+
   const uriManager = new UriManager()
-  
+
   const states = {
     issues: {
-      script: showIssues, 
-      template: `
+      script: showIssues,
+      template: Handlebars.compile(`
         <section id="show-issues">
         <h1>Issues List</h1>
         <table>
@@ -31,7 +30,12 @@ window.onload = function (e) {
         </tr>
         </thead>
         <tbody id="items">
-        
+        {{#each this}}
+          <tr>
+            <td><a href="#issue/{{id}}">{{name}}</a></td>
+            <td>{{description}}</td>
+          </tr>
+       {{/each}}
         </tbody>
         </table>
         </section>
@@ -44,74 +48,60 @@ window.onload = function (e) {
         </div>
         <button id="create-issue-btn">Create Issue</button>
       
-      </section>`
+      </section>`)
     },
     issue: {
-      script: showIssue, 
-      template: `<h1>Issues details</h1>
+      script: showIssue,
+      template: Handlebars.compile(`<h1>Issues details</h1>
       <article>
-      <div id="id">Id: </div>
-      <div id="name">Name: </div> 
-      <div id="description">Description: </div>
-      </article>`,
+      <div id="id">Id: {{id}}</div>
+      <div id="name">Name: {{name}}</div> 
+      <div id="description">Description: {{description}} </div>
+      </article>`),
     },
     about: {
       script: nop,
-      template: `<h1>About Issues application (TBD)</h1>`
+      template: Handlebars.compile(`<h1>About Issues application (TBD)</h1>`)
     }
   }
-  
-  
+
+
   window.onhashchange = stateChanged
   const mainContent = document.querySelector("#main-content")
 
   stateChanged()
-  
+
   function stateChanged() {
     let stateData = window.location.hash.substring(1).split("/")
-    
+
     let [state, ...stateArgs] = stateData
     // Equivalent conde to the previous line
     // let state = stateData.shift()
     // let stateArgs = stateData 
-    
-    
-    let stateObj  = states[state]
-    if(!stateObj) {
+
+
+    let stateObj = states[state]
+    if (!stateObj) {
       window.location.hash = "issues"
       return
     }
-    mainContent.innerHTML = stateObj.template
+  
     //stateObj.script.apply(null, stateArgs)
     stateObj.script(...stateArgs)
- }
+  }
 
+
+  ////// Functions executed in each page state
   function showIssues() {
-    document.querySelector("#create-issue-btn").onclick = createIssue
-
     fetch(uriManager.getAllIssuesUri())
       .then(rsp => rsp.json())
-      .then(showItems)
+      .then(showView)
 
+    function showView(items) {
+      mainContent.innerHTML = states.issues.template(items)
 
-
-    function showItems(items) {
-      const itemsTemplate = Handlebars.compile(
-        `
-        {{#each this}}
-          <tr>
-            <td><a href="#issue/{{id}}">{{name}}</a></td>
-            <td>{{description}}</td>
-          </tr>
-        {{/each}}
-        `)
-
-      let itemsHtml = itemsTemplate(items)
-
-      const table = document.querySelector("#items")
-      table.innerHTML += itemsHtml
+      document.querySelector("#create-issue-btn").onclick = createIssue
     }
-
 
     function createIssue() {
       let issue = {}
@@ -145,10 +135,10 @@ window.onload = function (e) {
     console.log(uri)
     fetch(uri)
       .then(rsp => rsp.json())
-      .then(showItem)
+      .then(showIssueView)
 
-    function showItem(item) {
-      Object.keys(item).forEach(propName => document.querySelector(`#${propName}`).innerHTML += item[propName])
+    function showIssueView(item) {
+      mainContent.innerHTML = states.issue.template(item)
     }
   }
 

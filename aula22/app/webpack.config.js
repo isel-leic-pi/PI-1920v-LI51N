@@ -1,10 +1,50 @@
-const path = require('path');
+
+const path = require('path')
+const distDir = path.resolve(__dirname, '..', 'public');
+
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack')
+
 
 module.exports = {
-  entry: './index.js',
-  mode: "development",
+  entry: {
+    index: './entry.js'
+  },
   output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js'
+    filename: '[name].js',
+    path: distDir,
+  },
+  mode: 'development',
+  devtool: 'source-map',
+
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './index.html',
+      chunks: ['index'],
+    }),
+    new webpack.ProvidePlugin({ 
+      $: 'jquery',
+      jQuery: 'jquery'
+    }),
+  ],
+
+  module: {
+    rules: [{
+      test: /\.css$/,
+      use: ['style-loader', 'css-loader']
+    },
+    {
+      test: /\.(hbs)$/,
+      use: {
+        loader: 'raw-loader',
+        options: {
+          esModule: false,
+        },
+      }
+    }, 
+    {
+      test: /\.(png|woff|woff2|eot|ttf|svg)$/,
+      loader: 'url-loader?limit=100000', }
+    ]
   }
 };

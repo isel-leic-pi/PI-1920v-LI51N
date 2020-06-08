@@ -83,7 +83,7 @@ module.exports = function () {
     return body
 
     function showBodyResponse(body) {
-      console.log(`Response body:"`, body)
+      //console.log(`Response body:"`, body)
       return body
     }
   }
@@ -103,7 +103,7 @@ module.exports = function () {
     }
 
     function showBodyResponse(body) {
-      console.log(`Response body:"`, body)
+      //console.log(`Response body:"`, body)
       return body
     }
   }

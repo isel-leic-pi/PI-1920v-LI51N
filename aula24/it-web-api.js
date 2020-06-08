@@ -7,37 +7,36 @@ const router = require('express').Router()
 
 
 module.exports = function (itServices) {
+  const AUTH_COOKIE_NAME = "Auth"
+
   router.get('/issues', getIssues)
   router.get('/issues/:id', getIssue)
   router.post('/issues', addIssue)
   router.delete('/issues/:id', deleteIssue)
   router.post('/auth/login', login)
   router.post('/auth/logout', logout)
-  
-
+  router.get('/auth/currentUser', currentUser)
+    
   Promise.prototype.sendResponse = sendResponse
-
+  
   return router;
-
+  
 
   // GET /it/api/issues
   function getIssues(req, rsp) {
-    itServices.getIssues().sendResponse(rsp)
+    itServices.getIssues(req.user).sendResponse(rsp)
   }
 
 
   // GET /it/api/issues/:id
   function getIssue(req, rsp) {
-    console.log(req.params.id)
-    itServices.getIssue(req.params.id).sendResponse(rsp)
+    itServices.getIssue(req.params.id, req.user).sendResponse(rsp)
   }
 
 
 
   // POST /it/api/issues
   function addIssue(req, rsp) {
-
-    console.log("body received: ", req.body)
     itServices.addIssue(req.body).sendResponse(rsp, 201)
   }
 
@@ -54,13 +53,24 @@ module.exports = function (itServices) {
     itServices.login(credentials).then(addAuthCookie).sendResponse(rsp)
 
     function addAuthCookie() {
-      rsp.cookie("Auth", credentials.username)
-
+      rsp.cookie(AUTH_COOKIE_NAME, credentials.username)
       return "User authenticated"
     }
   }
 
   function logout(req, rsp) {
+    itServices.logout().then(removeAuthCookie).sendResponse(rsp)
+
+    function removeAuthCookie() {
+      rsp.clearCookie(AUTH_COOKIE_NAME)
+      return Promise.resolve("user logged out")
+    }
+
+  }
+
+  function currentUser(req, rsp) {
+    console.log("$$$$$$")
+    Promise.resolve({ user: req.user} ).sendResponse(rsp)
   }
 
 
@@ -77,6 +87,7 @@ module.exports = function (itServices) {
   }
 
   function processError(rsp, statusCode) {
+    
     return processResponse(rsp, (data) => error.toHttpStatusCode(data))
   }
 

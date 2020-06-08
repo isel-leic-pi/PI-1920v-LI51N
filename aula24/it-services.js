@@ -10,14 +10,16 @@ module.exports = function (itDb) {
     getIssue: getIssue,
     addIssue: addIssue,
     deleteIssue: deleteIssue,
-    login: login
+    login: login,
+    logout: logout
   }
 
   function init(db) {
     itDb = db
   }
 
-  async function getIssues() {
+  async function getIssues(user) {
+    console.log(`Getting issues for user ${user}`)
     return itDb.getIssues()//.then(processIssues)
 
     function processIssues(issues) {
@@ -31,7 +33,7 @@ module.exports = function (itDb) {
     // return issues.map((issue, idx) => { issue.idx = idx; return issue })
   }
 
-  function getIssue(id) {
+  function getIssue(id, user) {
     if (isInvalidId(id)) {
       return Promise.resolve(error('Invalid id to get a resource'))
     }
@@ -39,13 +41,13 @@ module.exports = function (itDb) {
     return itDb.getIssue(id)
   }
 
-  function addIssue(issue) {
+  function addIssue(issue, user) {
     // Issue validation should be done here
 
     return itDb.addIssue(issue)
   }
 
-  function deleteIssue(id) {
+  function deleteIssue(id, user) {
     if (isInvalidId(id)) {
       return Promise.reject(error('Invalid id for resource to delete'))
     }
@@ -57,6 +59,12 @@ module.exports = function (itDb) {
   function login(credentials) {
     return Promise.resolve(true)
   }
+
+  function logout() {
+    return Promise.resolve(true)
+  }
+
+
 
 
   function isInvalidId(id) {

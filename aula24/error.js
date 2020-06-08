@@ -5,5 +5,6 @@ module.exports = function error(message) {
 }
 
 module.exports.toHttpStatusCode = function(e) {
+  console.log("error: ", e)
   return 404;
 }

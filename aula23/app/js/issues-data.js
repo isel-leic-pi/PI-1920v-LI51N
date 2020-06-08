@@ -1,6 +1,7 @@
 module.exports = {
-  showIssue: showIssue,
-  showIssues: showIssues
+  getIssues: getIssues,
+  getIssue: getIssue,
+  createIssue: createIssue
 }
 
 function UriManager() {
@@ -18,54 +19,28 @@ function UriManager() {
 
 const uriManager = new UriManager()
 
-const main = require('./main-content')
-
-function showIssues() {
-  fetch(uriManager.getAllIssuesUri())
+function getIssues() {
+  return fetch(uriManager.getAllIssuesUri())
     .then(rsp => rsp.json())
-    .then(showView)
+}
 
-  function showView(items) {
-    main.mainContent.innerHTML = main.states.issues.template(items)
+function getIssue(issueId) {
+  let uri = uriManager.getIssueUri(issueId)
+  
+  return fetch(uri)
+    .then(rsp => rsp.json())
+}
 
-    document.querySelector("#create-issue-btn").onclick = createIssue
-  }
-
-  function createIssue() {
-    let issue = { }
-    document.querySelectorAll(".issue-data input").forEach(input => issue[input.id] = input.value)
-
+function createIssue(issue) {
     const issueBody = JSON.stringify(issue)
 
-    console.log(`Issue obj ${issueBody}`)
-
     const uri = uriManager.getAddIssueUri();
-    fetch(uri, {
+    return fetch(uri, {
       method: "POST",
       headers: {
         "Content-Type": "application/json; charset=utf-8",
       },
       body: issueBody
-    }).then(processResponse)
-
-    function processResponse(response) {
-      if (response.ok) {
-        location.reload()
-      } else {
-        console.log("error creating issue")
-      }
-    }
+    }).then(rsp => rsp.json())
   }
-}
 
-function showIssue(issueId) {
-  let uri = uriManager.getIssueUri(issueId)
-  console.log(uri)
-  fetch(uri)
-    .then(rsp => rsp.json())
-    .then(showIssueView)
-
-  function showIssueView(item) {
-    main.mainContent.innerHTML = main.states.issue.template(item)
-  }
-}

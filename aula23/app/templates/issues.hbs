@@ -1,0 +1,29 @@
+<section id="show-issues">
+  <h1>Issues List</h1>
+  <table>
+    <thead>
+      <tr>
+        <td>Name</td>
+        <td>Description</td>
+      </tr>
+    </thead>
+    <tbody id="items">
+      {{#each this}}
+      <tr>
+        <td><a href="#issue/{{id}}">{{name}}</a></td>
+        <td>{{description}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</section>
+
+<section id="create-issue">
+  <h2>Create a new Issue</h2>
+  <div class="issue-data">
+    <div><span>Issue name: </span><input type="text" id="name" /></div>
+    <div><span>Issue description:</span><input type="text" id="description" /></div>
+  </div>
+  <button id="create-issue-btn">Create Issue</button>
+
+</section>

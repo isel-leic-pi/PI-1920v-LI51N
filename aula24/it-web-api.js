@@ -52,9 +52,10 @@ module.exports = function (itServices) {
     const credentials = req.body
     itServices.login(credentials).then(addAuthCookie).sendResponse(rsp)
 
-    function addAuthCookie() {
-      rsp.cookie(AUTH_COOKIE_NAME, credentials.username)
-      return "User authenticated"
+    function addAuthCookie(loginStatus) {
+      if(loginStatus.ok)
+        rsp.cookie(AUTH_COOKIE_NAME, credentials.username)
+      return loginStatus
     }
   }
 
@@ -65,7 +66,6 @@ module.exports = function (itServices) {
       rsp.clearCookie(AUTH_COOKIE_NAME)
       return Promise.resolve("user logged out")
     }
-
   }
 
   function currentUser(req, rsp) {

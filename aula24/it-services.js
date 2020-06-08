@@ -57,7 +57,7 @@ module.exports = function (itDb) {
 
 
   function login(credentials) {
-    return Promise.resolve(true)
+    return Promise.resolve({ok: true})
   }
 
   function logout() {

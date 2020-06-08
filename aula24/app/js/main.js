@@ -1,5 +1,9 @@
 window.onload = function (e) {  
-  let issuesData = require('./issues-data')
-  let states = require('./issues-controller')(issuesData)
+  const issuesData = require('./issues-data')
+  const authStates = require('./auth-controller')(issuesData)
+  const issuesStates = require('./issues-controller')(issuesData)
+
+
+  const states = Object.assign(authStates, issuesStates) 
   require('./state-router')(states, "issues")
 }

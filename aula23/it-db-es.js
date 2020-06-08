@@ -9,7 +9,7 @@ const fetch = require('node-fetch')
 
 
 module.exports = function () {
-  
+
   const uriManager = new UriManager()
 
   return {
@@ -24,32 +24,33 @@ module.exports = function () {
     this.getAllIssuesUri = () => `${baseUri}_search/`
     this.getIssueUri = (id) => `${baseUri}_doc/${id}`
     this.getAddIssueUri = () => `${baseUri}_doc/`
+    this.refresh = () => `${baseUri}_refresh/`
   }
-  
+
   function getIssues() {
     console.log("GetIssues")
     let uri = uriManager.getAllIssuesUri()
     return makeRequest(uri)
-      .then(body => body.hits.hits.map(issue => { return {id: issue._id, name: issue._source.name, description: issue._source.description } }))
+      .then(body => body.hits.hits.map(issue => { return { id: issue._id, name: issue._source.name, description: issue._source.description } }))
   }
 
   function getIssue(id) {
     let uri = uriManager.getIssueUri(id)
-    return makeRequest(uri).then(body => { 
+    return makeRequest(uri).then(body => {
       return {
-        id: body._id, 
+        id: body._id,
         name: body._source.name,
         description: body._source.description,
 
-      } 
+      }
     })
   }
 
   function addIssue(issue) {
 
-    
+
     const uri = uriManager.getAddIssueUri()
-    const options = {method: "post", body: JSON.stringify(issue),  headers: { 'Content-Type': 'application/json' } }
+    const options = { method: "post", body: JSON.stringify(issue), headers: { 'Content-Type': 'application/json' } }
     return makeRequest(uri, options).then(body => { issue.id = body._id; return issue })
   }
 
@@ -68,12 +69,38 @@ module.exports = function () {
     return Promise.resolve(issue)
   }
 
-/////////////////////////////////////
+  /////////////////////////////////////
 
-  function makeRequest(uri, options) {
+  async function makeRequestAA(uri, options, refresh) {
     console.log(`Making a request to ${uri} `)
-    return fetch(uri, options).then(rsp => rsp.json()).then(showBodyResponse)
+    const body = await fetch(uri, options).then(rsp => rsp.json())
+    showBodyResponse(body)
 
+    if(refresh) {
+      await fetch(uriManager.refresh())
+    }
+    
+    return body
+
+    function showBodyResponse(body) {
+      console.log(`Response body:"`, body)
+      return body
+    }
+  }
+
+  function makeRequest(uri, options, refresh) {
+    console.log(`Making a request to ${uri} `)
+    return fetch(uri, options)
+      .then(rsp => rsp.json())
+      .then(showBodyResponse)
+      .then(refreshDb)
+
+    function refreshDb(body) {
+      if (refresh) {
+        return fetch(uriManager.refresh()).then(__ => body)
+      }
+      return body
+    }
 
     function showBodyResponse(body) {
       console.log(`Response body:"`, body)

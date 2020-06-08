@@ -9,7 +9,8 @@ module.exports = function (itDb) {
     getIssues: getIssues,
     getIssue: getIssue,
     addIssue: addIssue,
-    deleteIssue: deleteIssue
+    deleteIssue: deleteIssue,
+    login: login
   }
 
   function init(db) {
@@ -50,6 +51,11 @@ module.exports = function (itDb) {
     }
 
     return itDb.deleteIssue(id)
+  }
+
+
+  function login(credentials) {
+    return Promise.resolve(true)
   }
 
 

@@ -11,6 +11,8 @@ module.exports = function (itServices) {
   router.get('/issues/:id', getIssue)
   router.post('/issues', addIssue)
   router.delete('/issues/:id', deleteIssue)
+  router.post('/auth/login', login)
+  router.post('/auth/logout', logout)
   
 
   Promise.prototype.sendResponse = sendResponse
@@ -45,6 +47,23 @@ module.exports = function (itServices) {
   function deleteIssue(req, rsp) {
     itServices.deleteIssue(req.params.id).sendResponse(rsp)
   }
+
+
+  function login(req, rsp) {
+    const credentials = req.body
+    itServices.login(credentials).then(addAuthCookie).sendResponse(rsp)
+
+    function addAuthCookie() {
+      rsp.cookie("Auth", credentials.username)
+
+      return "User authenticated"
+    }
+  }
+
+  function logout(req, rsp) {
+  }
+
+
 
   ////////////// Internal auxiliary functions
 

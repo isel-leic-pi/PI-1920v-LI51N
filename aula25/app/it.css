@@ -1,0 +1,9 @@
+tbody tr:nth-child(odd) {
+  background-color: gray;
+}
+
+
+.issue-data span {
+  display: inline-block;
+  width: 20ex
+}

@@ -1,4 +1,4 @@
-module.exports = function (issuesData) {
+module.exports = function (issuesData, context) {
   const mainContent = document.querySelector("#main-content")
   const templates = require('./templates')
 
@@ -9,7 +9,11 @@ module.exports = function (issuesData) {
   }
 
   function showIssues() {
-    issuesData.getIssues().then(showView)
+    if(context.user) {
+      issuesData.getIssues().then(showView)
+    } else {
+      location.hash = "login"
+    }
 
     function showView(items) {
       mainContent.innerHTML = templates.issues(items)

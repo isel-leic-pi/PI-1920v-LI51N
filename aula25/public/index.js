@@ -138,7 +138,7 @@ module.exports = content.locals || {};
 
 
 
-module.exports = function (issuesData) {
+module.exports = function (issuesData, context) {
   const authInfo = document.querySelector("#auth-info")
   const mainContent = document.querySelector("#main-content")
   const templates = __webpack_require__(/*! ./templates */ "./js/templates.js")
@@ -154,7 +154,7 @@ module.exports = function (issuesData) {
     issuesData.currentUser().then(showCurrentUserInfo)
 
     function showCurrentUserInfo(user) {
-      let loggedIn = user.user; 
+      let loggedIn = context.user = user.user
       authInfo.innerHTML = loggedIn  ? templates.userLoggedIn(user) : templates.userLoggedOut()
     }
   }
@@ -199,7 +199,7 @@ module.exports = function (issuesData) {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = function (issuesData) {
+module.exports = function (issuesData, context) {
   const mainContent = document.querySelector("#main-content")
   const templates = __webpack_require__(/*! ./templates */ "./js/templates.js")
 
@@ -210,7 +210,11 @@ module.exports = function (issuesData) {
   }
 
   function showIssues() {
-    issuesData.getIssues().then(showView)
+    if(context.user) {
+      issuesData.getIssues().then(showView)
+    } else {
+      location.hash = "login"
+    }
 
     function showView(items) {
       mainContent.innerHTML = templates.issues(items)
@@ -330,9 +334,10 @@ function createIssue(issue) {
 /***/ (function(module, exports, __webpack_require__) {
 
 window.onload = function (e) {  
+  let context = {}
   const issuesData = __webpack_require__(/*! ./issues-data */ "./js/issues-data.js")
-  const authStates = __webpack_require__(/*! ./auth-controller */ "./js/auth-controller.js")(issuesData)
-  const issuesStates = __webpack_require__(/*! ./issues-controller */ "./js/issues-controller.js")(issuesData)
+  const authStates = __webpack_require__(/*! ./auth-controller */ "./js/auth-controller.js")(issuesData, context)
+  const issuesStates = __webpack_require__(/*! ./issues-controller */ "./js/issues-controller.js")(issuesData, context)
 
 
   const states = Object.assign(authStates, issuesStates) 

@@ -1,7 +1,7 @@
 
 
 
-module.exports = function (issuesData) {
+module.exports = function (issuesData, context) {
   const authInfo = document.querySelector("#auth-info")
   const mainContent = document.querySelector("#main-content")
   const templates = require('./templates')
@@ -17,13 +17,10 @@ module.exports = function (issuesData) {
     issuesData.currentUser().then(showCurrentUserInfo)
 
     function showCurrentUserInfo(user) {
-      let loggedIn = user.user; 
+      let loggedIn = context.user = user.user
       authInfo.innerHTML = loggedIn  ? templates.userLoggedIn(user) : templates.userLoggedOut()
     }
   }
-
-
-  
 
 
   function login() {

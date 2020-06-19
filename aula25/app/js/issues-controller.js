@@ -16,6 +16,8 @@ module.exports = function (issuesData, context) {
     }
 
     function showView(items) {
+      items.img = require('../images/slb.png').default
+      console.log(items.img)
       mainContent.innerHTML = templates.issues(items)
       document.querySelector("#create-issue-btn").onclick = createIssue
 
